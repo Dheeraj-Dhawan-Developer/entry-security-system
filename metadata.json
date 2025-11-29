@@ -1,0 +1,7 @@
+{
+  "name": "SecureEvent Pass",
+  "description": "A secure event entry management system for schools using QR codes and AI-powered greetings.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
