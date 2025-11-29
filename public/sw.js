@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'secure-event-v21';
+const CACHE_NAME = 'secure-event-v25';
 const urlsToCache = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only cache http/https requests, skip chrome-extension:// etc
   if (!event.request.url.startsWith('http')) return;
   
   event.respondWith(
