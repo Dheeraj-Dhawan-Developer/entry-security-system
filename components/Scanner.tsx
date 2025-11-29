@@ -1,6 +1,7 @@
+
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import jsQR from 'jsqr';
-import { Camera, XCircle, CheckCircle, RefreshCw, AlertTriangle, Loader2 } from 'lucide-react';
+import { Camera, XCircle, CheckCircle, RefreshCw, AlertTriangle, Loader2, Scan } from 'lucide-react';
 import { validateAndEnter } from '../services/storageService';
 import { TicketRecord, QRCodeData } from '../types';
 import { generateWelcomeMessage } from '../services/geminiService';
@@ -26,13 +27,13 @@ export const Scanner: React.FC = () => {
       try {
         data = JSON.parse(code);
       } catch (e) {
-        setScanResult({ success: false, message: "Invalid QR format. Not a valid event ticket." });
+        setScanResult({ success: false, message: "Invalid Format. Not a secure event ticket." });
         setProcessing(false);
         return;
       }
 
       if (!data.id) {
-         setScanResult({ success: false, message: "Invalid Ticket: Missing ID." });
+         setScanResult({ success: false, message: "Invalid Ticket: Missing Security ID." });
          setProcessing(false);
          return;
       }
@@ -50,7 +51,7 @@ export const Scanner: React.FC = () => {
 
     } catch (e) {
       console.error("Scan Error:", e);
-      setScanResult({ success: false, message: "Error reading ticket data or connecting to database." });
+      setScanResult({ success: false, message: "System Error. Please try again." });
     } finally {
         setProcessing(false);
     }
@@ -59,21 +60,19 @@ export const Scanner: React.FC = () => {
   useEffect(() => {
     let animationFrameId: number;
     let stream: MediaStream | null = null;
-    let active = true; // Prevents race conditions in strict mode
+    let active = true;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
     if (!scanning || !video || !canvas) return;
 
-    // Optimize for frequent reads
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     
     const tick = () => {
       if (!active) return;
 
       if (video.readyState === video.HAVE_ENOUGH_DATA && ctx) {
-        // Match canvas size to video stream
         canvas.height = video.videoHeight;
         canvas.width = video.videoWidth;
         
@@ -81,9 +80,8 @@ export const Scanner: React.FC = () => {
         
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
-        // Scan for QR code
         const code = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: "attemptBoth", // Robustness over speed
+          inversionAttempts: "attemptBoth",
         });
 
         if (code && code.data && !processing) {
@@ -105,13 +103,11 @@ export const Scanner: React.FC = () => {
         }
         stream = mediaStream;
         video.srcObject = stream;
-        video.setAttribute("playsinline", "true"); // Critical for iOS
-        video.setAttribute("webkit-playsinline", "true"); // Critical for iOS
+        video.setAttribute("playsinline", "true");
         
-        // Ensure video plays
         video.play().catch(e => {
             console.error("Video play failed", e);
-            setCameraError("Camera stream failed to start.");
+            setCameraError("Unable to access camera stream.");
         });
 
         animationFrameId = requestAnimationFrame(tick);
@@ -119,7 +115,7 @@ export const Scanner: React.FC = () => {
       .catch((err) => {
         console.error("Camera access error:", err);
         if (active) {
-          setCameraError("Camera access denied. Please allow camera permissions.");
+          setCameraError("Camera access denied. Please verify permissions.");
         }
       });
 
@@ -141,32 +137,50 @@ export const Scanner: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto p-4">
-      <div className="w-full bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 relative">
+      <div className="w-full glass-panel rounded-3xl overflow-hidden shadow-2xl relative border border-slate-600/50">
         
-        {/* Header */}
-        <div className="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-            <Camera className="w-5 h-5 text-indigo-400" />
-            Security Scanner
-          </h2>
+        {/* Header HUD */}
+        <div className="bg-slate-900/80 backdrop-blur-md p-4 border-b border-slate-700/50 flex justify-between items-center z-20 relative">
           <div className="flex items-center gap-2">
-             <div className={`w-2 h-2 rounded-full ${scanning && !processing ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-             <span className="text-xs text-slate-400">{scanning && !processing ? 'Active' : 'Paused'}</span>
+            <div className="bg-indigo-500/20 p-1.5 rounded-lg">
+               <Scan className="w-5 h-5 text-indigo-400" />
+            </div>
+            <h2 className="text-sm font-bold text-slate-200 tracking-wide uppercase">Optical Scanner</h2>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/40 rounded-full border border-slate-700/50">
+             <div className={`w-2 h-2 rounded-full shadow-[0_0_8px] ${scanning && !processing ? 'bg-emerald-500 shadow-emerald-500/50 animate-pulse' : 'bg-red-500 shadow-red-500/50'}`}></div>
+             <span className="text-[10px] font-mono text-slate-400 uppercase">{scanning && !processing ? 'Live Feed' : 'Standby'}</span>
           </div>
         </div>
 
-        {/* Camera Viewport */}
-        <div className="relative aspect-square bg-black overflow-hidden">
+        {/* Viewport */}
+        <div className="relative aspect-[4/5] bg-black overflow-hidden">
+          
+          {/* Default State Overlay */}
           {scanning && !cameraError && !processing && (
-             <div className="absolute inset-0 border-2 border-indigo-500/50 z-10 m-12 rounded-xl animate-pulse flex items-center justify-center">
-                <p className="text-indigo-400/80 text-xs font-mono bg-black/50 px-2 py-1 rounded">Align QR Code</p>
+             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+                {/* HUD Corners */}
+                <div className="absolute top-8 left-8 w-16 h-16 border-t-4 border-l-4 border-indigo-500/80 rounded-tl-2xl"></div>
+                <div className="absolute top-8 right-8 w-16 h-16 border-t-4 border-r-4 border-indigo-500/80 rounded-tr-2xl"></div>
+                <div className="absolute bottom-8 left-8 w-16 h-16 border-b-4 border-l-4 border-indigo-500/80 rounded-bl-2xl"></div>
+                <div className="absolute bottom-8 right-8 w-16 h-16 border-b-4 border-r-4 border-indigo-500/80 rounded-br-2xl"></div>
+                
+                {/* Laser Scan Line */}
+                <div className="scan-line top-1/2"></div>
+                
+                <p className="text-white/70 text-xs font-mono bg-black/40 backdrop-blur px-3 py-1 rounded-full border border-white/10 mt-32">
+                  [ WAITING FOR TICKET ]
+                </p>
              </div>
           )}
           
           {cameraError ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-30">
-               <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-               <p className="text-red-400 text-sm">{cameraError}</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-30 bg-slate-900">
+               <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+                  <AlertTriangle className="w-10 h-10 text-red-500" />
+               </div>
+               <h3 className="text-white font-bold text-lg mb-2">Camera Error</h3>
+               <p className="text-slate-400 text-sm">{cameraError}</p>
             </div>
           ) : (
             <>
@@ -182,49 +196,68 @@ export const Scanner: React.FC = () => {
 
           {/* Processing Overlay */}
           {processing && (
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
-                <Loader2 className="w-12 h-12 text-indigo-400 animate-spin mb-4" />
-                <p className="text-white font-medium">Verifying Ticket...</p>
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+                <div className="relative">
+                   <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+                   <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-indigo-500/20 rounded-full animate-pulse"></div>
+                   </div>
+                </div>
+                <p className="text-indigo-400 font-mono mt-6 animate-pulse tracking-widest text-xs">DECRYPTING...</p>
             </div>
           )}
 
           {/* Result Overlay */}
           {!scanning && scanResult && (
-             <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-300">
+             <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-md z-20 flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-300">
                 {scanResult.success ? (
-                  <CheckCircle className="w-20 h-20 text-green-500 mb-4 drop-shadow-[0_0_15px_rgba(34,197,94,0.5)]" />
+                  <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(16,185,129,0.3)] ring-1 ring-emerald-500/50">
+                    <CheckCircle className="w-12 h-12 text-emerald-400" />
+                  </div>
                 ) : (
-                  <XCircle className="w-20 h-20 text-red-500 mb-4 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+                  <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(239,68,68,0.3)] ring-1 ring-red-500/50">
+                    <XCircle className="w-12 h-12 text-red-400" />
+                  </div>
                 )}
                 
-                <h3 className={`text-2xl font-bold mb-2 ${scanResult.success ? 'text-green-400' : 'text-red-400'}`}>
+                <h3 className={`text-3xl font-black mb-2 tracking-tight ${scanResult.success ? 'text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-emerald-500' : 'text-red-500'}`}>
                   {scanResult.success ? 'ACCESS GRANTED' : 'ACCESS DENIED'}
                 </h3>
                 
-                <p className="text-slate-300 mb-6 font-medium text-lg">
+                <p className="text-slate-300 mb-8 font-medium text-lg leading-relaxed max-w-[280px]">
                   {scanResult.message}
                 </p>
 
                 {scanResult.record && (
-                  <div className="bg-slate-800 p-4 rounded-lg w-full mb-6 border border-slate-700">
-                    <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Guest Identity</p>
-                    <p className="text-xl font-bold text-white">{scanResult.record.name}</p>
-                    <p className="text-indigo-400">{scanResult.record.className} • {scanResult.record.admissionNumber}</p>
+                  <div className="bg-gradient-to-b from-slate-800 to-slate-900 p-5 rounded-2xl w-full mb-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
+                    
+                    <div className="relative z-10 text-left">
+                        <p className="text-slate-500 text-[10px] uppercase tracking-widest font-bold mb-2">Guest Identity</p>
+                        <p className="text-2xl font-bold text-white mb-1">{scanResult.record.name}</p>
+                        <div className="flex items-center gap-2">
+                           <span className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-xs font-mono border border-indigo-500/20">{scanResult.record.className}</span>
+                           <span className="text-slate-500 text-sm">•</span>
+                           <span className="text-slate-400 text-sm font-mono">{scanResult.record.admissionNumber}</span>
+                        </div>
+                    </div>
                   </div>
                 )}
 
                 {/* AI Greeting Section */}
                 {scanResult.success && (
-                  <div className="w-full mb-6 min-h-[60px]">
+                  <div className="w-full mb-8 min-h-[60px]">
                     {loadingAi ? (
-                      <div className="flex items-center justify-center gap-2 text-slate-500">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-xs">Generating welcome...</span>
+                      <div className="flex items-center justify-center gap-3 text-slate-400 bg-slate-800/50 p-3 rounded-xl border border-dashed border-slate-700">
+                        <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                        <span className="text-xs font-mono">Connecting to AI Host...</span>
                       </div>
                     ) : (
                       aiGreeting && (
-                        <div className="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 p-3 rounded border border-indigo-500/30">
-                           <p className="text-indigo-200 text-sm italic">"{aiGreeting}"</p>
+                        <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 rounded-xl border border-indigo-500/20 relative">
+                           <div className="absolute -top-2 left-4 px-2 bg-slate-900 text-[10px] text-indigo-400 font-bold uppercase tracking-wider">AI Announcement</div>
+                           <p className="text-indigo-200 text-sm font-medium italic leading-relaxed">"{aiGreeting}"</p>
                         </div>
                       )
                     )}
@@ -233,20 +266,16 @@ export const Scanner: React.FC = () => {
 
                 <button 
                   onClick={resetScanner}
-                  className="bg-white text-slate-900 px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition-colors flex items-center gap-2 shadow-lg hover:scale-105 transform duration-150"
+                  className="w-full bg-white text-slate-950 px-8 py-4 rounded-xl font-bold hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <RefreshCw className="w-5 h-5" />
-                  Scan Next
+                  Scan Next Ticket
                 </button>
              </div>
           )}
         </div>
         
       </div>
-      <p className="mt-4 text-slate-500 text-xs text-center">
-        Ensure good lighting for faster scanning. <br/> 
-        Data is synced with Firebase Cloud.
-      </p>
     </div>
   );
 };

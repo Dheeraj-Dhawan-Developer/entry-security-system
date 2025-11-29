@@ -12,89 +12,39 @@
     
     <title>SecureEvent Pass</title>
     
-    <!-- Icons (Fixed 404s by using reliable CDN) -->
+    <!-- Icons -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="https://unpkg.com/lucide-static@0.344.0/icons/shield-check.svg">
     <link rel="apple-touch-icon" href="https://unpkg.com/lucide-static@0.344.0/icons/shield-check.svg">
     
-    <!-- Tailwind CSS (CDN is fine for simple deployment, but Build step is better for production. Keeping CDN for simplicity) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Initial Loader Style -->
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #0f172a; /* Slate 900 */
-        color: #f8fafc;
-        overscroll-behavior-y: none; /* Prevents pull-to-refresh on mobile */
-      }
-      /* Hide scrollbar for clean UI */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #1e293b; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #475569; 
-        border-radius: 4px;
-      }
-      
-      #error-overlay {
-        display: none;
+      body { background-color: #0f172a; margin: 0; padding: 0; }
+      .initial-loader {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0; width: 100%; height: 100%;
         background: #0f172a;
-        color: #ef4444;
-        padding: 20px;
+        background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         z-index: 9999;
-        overflow: auto;
-        font-family: monospace;
+        color: white;
+        font-family: 'Inter', sans-serif;
       }
-
-      /* Loading Spinner */
-      .loader {
-        border: 4px solid #1e293b;
+      .spinner {
+        width: 48px; height: 48px;
+        border: 4px solid rgba(255,255,255,0.1);
+        border-top-color: #6366f1;
         border-radius: 50%;
-        border-top: 4px solid #6366f1;
-        width: 40px;
-        height: 40px;
-        -webkit-animation: spin 1s linear infinite; /* Safari */
         animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
       }
-
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      /* Print Styles */
-      @media print {
-        body * {
-          visibility: hidden;
-        }
-        .printable-area, .printable-area * {
-          visibility: visible;
-        }
-        .printable-area {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          background: white;
-          color: black;
-        }
-        .no-print {
-          display: none !important;
-        }
-        * {
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-        }
-      }
+      @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
   <script type="importmap">
 {
@@ -103,54 +53,41 @@
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
-    "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "jsqr": "https://aistudiocdn.com/jsqr@^1.4.0",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
     "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5",
     "jspdf": "https://aistudiocdn.com/jspdf@^3.0.4",
     "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
     "react-qr-code": "https://aistudiocdn.com/react-qr-code@^2.0.18",
-    "jsqr": "https://aistudiocdn.com/jsqr@^1.4.0"
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
 </head>
   <body>
-    <div id="error-overlay"></div>
-    <div id="root" class="flex h-screen w-full flex-col items-center justify-center text-white">
-        <div class="loader mb-4"></div>
-        <h2 class="text-xl font-bold">SecureEvent Pass</h2>
-        <p class="text-slate-400 text-sm mt-2">Loading System...</p>
+    <div id="root">
+        <div class="initial-loader">
+            <div class="spinner"></div>
+            <p style="opacity: 0.8; font-size: 14px; letter-spacing: 2px; font-weight: 600; text-transform: uppercase;">Secure System Loading</p>
+        </div>
     </div>
     
-    <!-- Entry Point for the Application -->
+    <!-- Entry Point -->
     <script type="module" src="./index.tsx"></script>
 
     <script>
-      // Global error handler
-      window.onerror = function(msg, url, lineNo, columnNo, error) {
-        const overlay = document.getElementById('error-overlay');
-        const root = document.getElementById('root');
-        // Ignore resizing errors common in React
-        if (msg.includes('ResizeObserver')) return false;
-
-        if (overlay) {
-          if(root) root.style.display = 'none';
-          overlay.style.display = 'block';
-          overlay.innerHTML += `<h3>App Crash Detected</h3><p>${msg}</p><pre>${error?.stack || ''}</pre>`;
-        }
-        return false;
-      };
-
+      // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // In Vite production build, files in 'public' are served at root
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('SW registered'))
-            .catch(err => console.log('SW failed', err));
+          if (!window.location.hostname.includes('webcontainer') && !window.location.hostname.includes('stackblitz')) {
+             navigator.serviceWorker.register('./sw.js')
+               .then(reg => console.log('SW active'))
+               .catch(err => console.log('SW failed', err));
+          }
         });
       }
     </script>

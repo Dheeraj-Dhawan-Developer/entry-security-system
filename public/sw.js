@@ -1,9 +1,8 @@
-const CACHE_NAME = 'secure-event-v16';
+const CACHE_NAME = 'secure-event-v17';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
   'https://unpkg.com/lucide-static@0.344.0/icons/shield-check.svg'
 ];
@@ -19,7 +18,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first strategy for reliability in production
+  // Network first strategy
   event.respondWith(
     fetch(event.request)
       .catch(() => {

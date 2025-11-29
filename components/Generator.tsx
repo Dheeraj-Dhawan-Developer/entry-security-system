@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Plus, Download, UserPlus, FileSpreadsheet, Upload, Printer, AlertCircle, CheckCircle2, FileText, Loader2, ChevronDown } from 'lucide-react';
@@ -231,7 +232,7 @@ export const Generator: React.FC = () => {
     <div className="w-full max-w-5xl mx-auto space-y-8">
       
       {/* Tab Navigation */}
-      <div className="flex gap-4 border-b border-slate-700 pb-1 no-print">
+      <div className="flex gap-4 border-b border-slate-700/50 pb-1 no-print">
         <button
           onClick={() => { setActiveTab('single'); setGeneratedTicket(null); setBulkResults(null); }}
           className={`pb-3 px-4 text-sm font-medium transition-all ${activeTab === 'single' ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-slate-400 hover:text-slate-200'}`}
@@ -247,55 +248,57 @@ export const Generator: React.FC = () => {
       </div>
 
       {activeTab === 'single' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-1">
           {/* Form Section */}
-          <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl h-fit">
+          <div className="glass-card p-6 md:p-8 rounded-3xl h-fit">
             <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <UserPlus className="w-6 h-6 text-indigo-400" />
+              <div className="bg-indigo-500/20 p-2 rounded-lg">
+                <UserPlus className="w-5 h-5 text-indigo-400" />
+              </div>
               Register Guest
             </h2>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-slate-400 mb-1">Full Name</label>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleInput}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:outline-none transition-all"
                   placeholder="e.g. John Doe"
                 />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">Admission No.</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Admission No.</label>
                   <input
                     type="text"
                     name="admissionNumber"
                     value={formData.admissionNumber}
                     onChange={handleInput}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:outline-none transition-all"
                     placeholder="e.g. A-1234"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">Class/Grade</label>
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Class/Grade</label>
                   <input
                     type="text"
                     name="className"
                     value={formData.className}
                     onChange={handleInput}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                    className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:outline-none transition-all"
                     placeholder="e.g. 10-B"
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-lg text-sm flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm flex items-start gap-3 backdrop-blur-sm">
+                  <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
@@ -303,10 +306,10 @@ export const Generator: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
               >
                 {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-                {isSaving ? 'Saving...' : 'Generate Pass'}
+                {isSaving ? 'Creating Ticket...' : 'Generate Secure Pass'}
               </button>
             </form>
           </div>
@@ -319,26 +322,26 @@ export const Generator: React.FC = () => {
                 <div className="mt-6 flex gap-4">
                   <button 
                     onClick={downloadQR}
-                    className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                    className="flex-1 bg-white hover:bg-slate-50 text-slate-900 py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors font-bold shadow-lg"
                   >
-                    <Download className="w-4 h-4" /> Save Ticket
+                    <Download className="w-4 h-4" /> Save Image
                   </button>
                   <button 
                     onClick={() => setGeneratedTicket(null)}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors border border-slate-600"
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-slate-600"
                   >
                     New Entry
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="text-center p-12 border-2 border-dashed border-slate-700 rounded-3xl bg-slate-800/50 w-full">
-                <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-600">
-                  <Download className="w-10 h-10 text-slate-500" />
+              <div className="text-center p-12 border-2 border-dashed border-slate-700/50 rounded-3xl bg-slate-800/30 w-full h-full flex flex-col items-center justify-center min-h-[400px]">
+                <div className="w-24 h-24 bg-slate-800 rounded-full flex items-center justify-center mb-6 border border-slate-700 shadow-inner">
+                  <Download className="w-10 h-10 text-slate-600" />
                 </div>
-                <h3 className="text-slate-300 font-medium text-lg">No Ticket Generated</h3>
+                <h3 className="text-slate-300 font-bold text-lg">No Ticket Generated</h3>
                 <p className="text-slate-500 mt-2 max-w-xs mx-auto">
-                  Fill out the form to generate a secure entry pass and QR code for the guest.
+                  Complete the form to create a unique QR pass for the guest.
                 </p>
               </div>
             )}
@@ -348,59 +351,69 @@ export const Generator: React.FC = () => {
         <div className="space-y-8 animate-in fade-in zoom-in duration-300">
           
           {/* Upload Area */}
-          <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-xl text-center no-print">
-            <FileSpreadsheet className="w-16 h-16 text-indigo-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">Bulk Import Students</h2>
-            <p className="text-slate-400 mb-8 max-w-lg mx-auto">
-              Upload an Excel (.xlsx, .xls) or CSV file containing <strong>Name</strong>, <strong>Admission No</strong>, and <strong>Class</strong> columns.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-               <label className="relative cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-8 rounded-lg shadow-lg shadow-indigo-500/20 transition-all group">
-                 <input 
-                   type="file" 
-                   accept=".xlsx,.xls,.csv" 
-                   onChange={handleFileUpload}
-                   className="hidden"
-                   disabled={isProcessing}
-                 />
-                 <span className="flex items-center gap-2">
-                   {isProcessing ? <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full"></div> : <Upload className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />}
-                   {isProcessing ? 'Processing...' : 'Select File'}
-                 </span>
-               </label>
-               
-               <button 
-                 onClick={downloadTemplate}
-                 className="text-indigo-400 hover:text-indigo-300 text-sm font-medium underline underline-offset-4"
-               >
-                 Download Template
-               </button>
-            </div>
-
-            {error && (
-              <div className="mt-6 bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-lg text-sm inline-flex items-center gap-2">
-                <AlertCircle className="w-4 h-4" /> {error}
+          <div className="glass-panel p-10 rounded-3xl text-center no-print relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-500/20 transition-all"></div>
+            
+            <div className="relative z-10">
+              <div className="w-20 h-20 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3 group-hover:rotate-6 transition-transform">
+                <FileSpreadsheet className="w-10 h-10 text-indigo-400" />
               </div>
-            )}
+              <h2 className="text-3xl font-bold text-white mb-3">Bulk Import Students</h2>
+              <p className="text-slate-400 mb-8 max-w-lg mx-auto text-lg">
+                Drag and drop your Excel file here to generate hundreds of tickets instantly.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <label className="relative cursor-pointer bg-white hover:bg-indigo-50 text-slate-900 font-bold py-4 px-8 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.15)] transition-all hover:scale-105 group">
+                  <input 
+                    type="file" 
+                    accept=".xlsx,.xls,.csv" 
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={isProcessing}
+                  />
+                  <span className="flex items-center gap-3">
+                    {isProcessing ? <div className="animate-spin w-5 h-5 border-2 border-slate-900/30 border-t-slate-900 rounded-full"></div> : <Upload className="w-5 h-5" />}
+                    {isProcessing ? 'Processing Data...' : 'Select Excel File'}
+                  </span>
+                </label>
+                
+                <button 
+                  onClick={downloadTemplate}
+                  className="text-slate-400 hover:text-white text-sm font-medium flex items-center gap-2 px-4 py-2 hover:bg-white/5 rounded-lg transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Download Template
+                </button>
+              </div>
+
+              {error && (
+                <div className="mt-8 bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm inline-flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" /> {error}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Results Area */}
           {bulkResults && (
             <div className="space-y-6">
               {/* Summary */}
-              <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
+              <div className="bg-slate-900/50 backdrop-blur-md rounded-2xl p-5 border border-slate-700/50 flex flex-col md:flex-row justify-between items-center gap-4 no-print shadow-xl">
                 <div className="flex items-center gap-6">
-                   <div className="flex items-center gap-2 text-green-400">
+                   <div className="flex items-center gap-3 text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span className="font-bold text-xl">{bulkResults.added.length}</span>
-                      <span className="text-sm text-slate-400">Successfully Generated</span>
+                      <div>
+                        <span className="font-bold text-xl block leading-none">{bulkResults.added.length}</span>
+                        <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Generated</span>
+                      </div>
                    </div>
                    {bulkResults.failed.length > 0 && (
-                     <div className="flex items-center gap-2 text-amber-400">
+                     <div className="flex items-center gap-3 text-amber-400 bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
                         <AlertCircle className="w-5 h-5" />
-                        <span className="font-bold text-xl">{bulkResults.failed.length}</span>
-                        <span className="text-sm text-slate-400">Duplicates Skipped</span>
+                         <div>
+                          <span className="font-bold text-xl block leading-none">{bulkResults.failed.length}</span>
+                          <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Skipped</span>
+                        </div>
                      </div>
                    )}
                 </div>
@@ -413,26 +426,29 @@ export const Generator: React.FC = () => {
                       <button 
                         onClick={() => setShowLayoutMenu(!showLayoutMenu)}
                         disabled={isGeneratingPdf}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors font-medium disabled:opacity-50 min-w-[160px] justify-between"
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-colors font-bold disabled:opacity-50 min-w-[180px] justify-between shadow-lg shadow-indigo-500/20"
                       >
                         <div className="flex items-center gap-2">
                           {isGeneratingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                          {isGeneratingPdf ? 'Generating...' : 'Download PDF'}
+                          {isGeneratingPdf ? 'Building PDF...' : 'Download PDF'}
                         </div>
                         <ChevronDown className="w-4 h-4" />
                       </button>
 
                       {showLayoutMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
-                          <div className="p-2 text-xs text-slate-500 font-medium uppercase bg-slate-900/50">Select Layout</div>
-                          <button onClick={() => generatePdf(1)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm">
-                            1 Ticket per Page
+                        <div className="absolute right-0 bottom-full mb-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden ring-1 ring-white/10 animate-in fade-in zoom-in duration-200">
+                          <div className="p-3 text-[10px] text-slate-500 font-bold uppercase tracking-wider bg-slate-900/80">Select Print Layout</div>
+                          <button onClick={() => generatePdf(1)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm transition-colors flex items-center justify-between group">
+                            <span>1 Ticket / Page</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Large</span>
                           </button>
-                          <button onClick={() => generatePdf(8)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm border-t border-slate-700">
-                            8 Tickets per Page (2x4)
+                          <button onClick={() => generatePdf(8)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm border-t border-slate-700/50 transition-colors flex items-center justify-between group">
+                            <span>8 Tickets / Page</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Grid</span>
                           </button>
-                          <button onClick={() => generatePdf(16)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm border-t border-slate-700">
-                            16 Tickets per Page (4x4)
+                          <button onClick={() => generatePdf(16)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm border-t border-slate-700/50 transition-colors flex items-center justify-between group">
+                            <span>16 Tickets / Page</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Compact</span>
                           </button>
                         </div>
                       )}
@@ -440,7 +456,7 @@ export const Generator: React.FC = () => {
                     
                     <button 
                       onClick={printBulk}
-                      className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors font-medium"
+                      className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-colors font-medium border border-slate-600"
                     >
                       <Printer className="w-4 h-4" /> Print
                     </button>
