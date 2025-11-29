@@ -1,44 +1,29 @@
-
-const CACHE_NAME = 'secure-event-v15';
+const CACHE_NAME = 'secure-event-v16';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
-  'https://esm.sh/react@18.2.0',
-  'https://esm.sh/react-dom@18.2.0',
-  'https://esm.sh/lucide-react@0.263.1?deps=react@18.2.0',
-  'https://esm.sh/firebase@10.8.1/app',
-  'https://esm.sh/firebase@10.8.1/firestore',
-  'https://esm.sh/firebase@10.8.1/analytics',
-  'https://esm.sh/firebase@10.8.1/auth'
+  'https://unpkg.com/lucide-static@0.344.0/icons/shield-check.svg'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache).catch(err => {
-            console.warn("Some assets failed to cache:", err);
-        });
+        return cache.addAll(urlsToCache);
       })
   );
   self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
-  if (!event.request.url.startsWith('http')) {
-     return;
-  }
-  
+  // Network first strategy for reliability in production
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+    fetch(event.request)
+      .catch(() => {
+        return caches.match(event.request);
       })
   );
 });

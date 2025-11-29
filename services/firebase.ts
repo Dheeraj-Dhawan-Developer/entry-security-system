@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
 import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import type { Analytics } from "firebase/analytics";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import type { Auth } from "firebase/auth";
@@ -17,7 +17,6 @@ export interface FirebaseConfig {
   measurementId?: string;
 }
 
-// Hardcoded configuration from user
 const firebaseConfig: FirebaseConfig = {
   apiKey: "AIzaSyAY2bdSOtvKpzGAEHHkMVwSPiU2AVwZ0ew",
   authDomain: "school-security-system-4f2e3.firebaseapp.com",
@@ -28,59 +27,43 @@ const firebaseConfig: FirebaseConfig = {
   measurementId: "G-T3PR2W84VB"
 };
 
-// Initialize Firebase Variables
-let app: FirebaseApp;
-let db: Firestore;
-let auth: Auth;
+let app: FirebaseApp | null = null;
+let db: Firestore | any = null; 
+let auth: Auth | null = null;
 let analytics: Analytics | null = null;
 let initializationError: string | null = null;
 
 try {
-  // 1. Initialize App
+  // Initialize App
   app = initializeApp(firebaseConfig);
   
-  // 2. Initialize Firestore
+  // Initialize Firestore
   db = getFirestore(app);
 
-  // 3. Initialize Auth & Sign In Anonymously
+  // Initialize Auth
   auth = getAuth(app);
   
-  // Auto-login to bypass standard "auth != null" rules
+  // Auto-login
   signInAnonymously(auth).catch((error) => {
-    console.error("Anonymous Auth Failed:", error);
-    // Don't block app initialization, might still work if rules are open
+    console.warn("Auth Failed:", error);
   });
 
-  // 4. Initialize Analytics (Optional)
-  if (typeof window !== 'undefined') {
-    try {
-      analytics = getAnalytics(app);
-    } catch (e) {
-      console.warn("Analytics blocked or failed:", e);
-    }
-  }
+  // Initialize Analytics safely
+  isSupported().then(yes => {
+    if (yes) analytics = getAnalytics(app);
+  }).catch(() => {});
 
-  // 5. Enable Offline Persistence
-  if (typeof window !== 'undefined') {
+  // Enable Persistence
+  if (typeof window !== 'undefined' && db) {
       enableIndexedDbPersistence(db).catch((err) => {
-        if (err.code === 'failed-precondition') {
-          console.warn('Persistence failed: Multiple tabs open');
-        } else if (err.code === 'unimplemented') {
-          console.warn('Persistence not supported by browser');
-        } else {
-          console.warn("Persistence error:", err);
-        }
+         console.log("Persistence disabled:", err.code);
       });
   }
 
 } catch (error: any) {
-  console.error("CRITICAL: Firebase Initialization Failed", error);
-  initializationError = error.message || "Unknown Firebase Error";
+  console.error("Firebase Init Error:", error);
+  initializationError = error.message;
 }
 
-// Backward compatibility stub
-export const saveConfig = (newConfig: FirebaseConfig) => {
-  console.log("Config is hardcoded.");
-};
-
+export const saveConfig = (newConfig: FirebaseConfig) => {};
 export { app, db, auth, analytics, initializationError };

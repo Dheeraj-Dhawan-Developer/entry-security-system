@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, PlusCircle, ScanLine, LayoutDashboard, Menu, X, Ticket, Download, Loader2, AlertTriangle, Lock } from 'lucide-react';
+import { ShieldCheck, PlusCircle, ScanLine, LayoutDashboard, Menu, X, Ticket, Download, Loader2, AlertTriangle, Lock, RefreshCw } from 'lucide-react';
 import { Generator } from './components/Generator';
 import { Scanner } from './components/Scanner';
 import { Stats } from './components/Stats';
@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isDbReady, setIsDbReady] = useState(false);
   const [appError, setAppError] = useState<string | null>(null);
+  const [timeoutError, setTimeoutError] = useState(false);
 
   useEffect(() => {
     // Check for critical startup errors from Firebase
@@ -24,6 +25,15 @@ const App: React.FC = () => {
     // Check if DB is ready (it should be immediate if firebase.ts initialized)
     if (db) {
         setIsDbReady(true);
+    } else {
+        // Poll for DB readiness in case of async import lag
+        const interval = setInterval(() => {
+            if (db) {
+                setIsDbReady(true);
+                clearInterval(interval);
+            }
+        }, 300);
+        return () => clearInterval(interval);
     }
 
     const handleBeforeInstallPrompt = (e: any) => {
@@ -41,11 +51,19 @@ const App: React.FC = () => {
     };
     window.addEventListener('unhandledrejection', handleRejection);
 
+    // Safety timeout
+    const timeoutTimer = setTimeout(() => {
+        if (!isDbReady && !appError) {
+            setTimeoutError(true);
+        }
+    }, 3000);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('unhandledrejection', handleRejection);
+      clearTimeout(timeoutTimer);
     };
-  }, []);
+  }, [isDbReady, appError]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
@@ -117,6 +135,31 @@ service cloud.firestore {
 
   // Loading Screen if DB is not ready
   if (!isDbReady) {
+    if (timeoutError) {
+        return (
+            <div className="h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-6 text-center space-y-6 animate-in fade-in duration-500">
+                <AlertTriangle className="w-12 h-12 text-amber-400" />
+                <div>
+                    <h1 className="text-xl font-bold text-white">Loading Slow?</h1>
+                    <p className="text-slate-400 mt-2 max-w-xs mx-auto">Firebase is taking longer than usual to connect. The database might be offline or blocked.</p>
+                </div>
+                <button 
+                    onClick={() => {
+                        // Force proceed even if DB isn't strictly "ready" yet, 
+                        // sometimes async imports lag but it works anyway.
+                        setIsDbReady(true);
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-lg font-bold transition-colors"
+                >
+                    <RefreshCw className="w-4 h-4" /> Enter Anyway
+                </button>
+                <div className="text-xs text-slate-600 mt-8">
+                    Status: DB={db ? 'Connected' : 'Waiting...'}
+                </div>
+            </div>
+        );
+    }
+
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-slate-900 text-white p-4 text-center space-y-4">
         <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
