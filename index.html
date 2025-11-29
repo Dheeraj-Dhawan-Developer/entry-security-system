@@ -76,14 +76,15 @@
         </div>
     </div>
     
-    <!-- Entry Point -->
+    <!-- Entry Point: Vite will compile this automatically during build -->
     <script type="module" src="./index.tsx"></script>
 
     <script>
       // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          if (!window.location.hostname.includes('webcontainer') && !window.location.hostname.includes('stackblitz')) {
+          // Only register in production/https to avoid localhost errors
+          if (!window.location.hostname.includes('webcontainer')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
                .catch(err => console.log('SW failed', err));

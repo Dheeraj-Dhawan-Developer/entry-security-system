@@ -1,4 +1,5 @@
-const CACHE_NAME = 'secure-event-v17';
+
+const CACHE_NAME = 'secure-event-v18';
 const urlsToCache = [
   './',
   './index.html',
@@ -18,11 +19,15 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first strategy
+  if (!event.request.url.startsWith('http')) return;
+  
   event.respondWith(
-    fetch(event.request)
-      .catch(() => {
-        return caches.match(event.request);
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
       })
   );
 });
