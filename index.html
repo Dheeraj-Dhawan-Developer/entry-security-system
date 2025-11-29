@@ -83,12 +83,12 @@
       // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Only register in production/https to avoid localhost errors
-          if (!window.location.hostname.includes('webcontainer')) {
+           // Register SW in production
+           if (!window.location.hostname.includes('webcontainer')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
                .catch(err => console.log('SW failed', err));
-          }
+           }
         });
       }
     </script>
