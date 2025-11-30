@@ -160,12 +160,20 @@ export const Generator: React.FC = () => {
     setIsGeneratingPdf(true);
     
     try {
-      // Define config with Orientation
+      // Configuration for A4 Pages
       const config = {
+        // 1 Ticket per page (Portrait) - Big and centered
         1: { orientation: 'p', cols: 1, rows: 1, w: 160, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
-        // Use Landscape for 8-up (4 cols x 2 rows) to prevent vertical overflow
-        8: { orientation: 'l', cols: 4, rows: 2, w: 65, xStart: 18, yStart: 20, xGap: 5, yGap: 10 },
-        16: { orientation: 'p', cols: 4, rows: 4, w: 45, xStart: 10, yStart: 10, xGap: 3, yGap: 5 }
+        
+        // 8 Tickets per page (Landscape) - A4 Landscape (297mm x 210mm)
+        // 4 cols x 2 rows. 
+        // Max Width per col approx 74mm. We use 62mm to be safe with margins.
+        8: { orientation: 'l', cols: 4, rows: 2, w: 62, xStart: 15, yStart: 15, xGap: 5, yGap: 5 },
+        
+        // 16 Tickets per page (Portrait) - A4 Portrait (210mm x 297mm)
+        // 4 cols x 4 rows.
+        // Max Width per col approx 52mm. We use 42mm.
+        16: { orientation: 'p', cols: 4, rows: 4, w: 42, xStart: 12, yStart: 12, xGap: 4, yGap: 4 }
       };
 
       const settings = config[layout];
@@ -181,7 +189,7 @@ export const Generator: React.FC = () => {
         
         if (element) {
           const canvas = await html2canvas(element, {
-            scale: layout === 16 ? 4 : 2, 
+            scale: 3, // Higher scale for clarity
             backgroundColor: '#ffffff',
             logging: false,
             useCORS: true 

@@ -83,8 +83,8 @@ export const TicketList: React.FC = () => {
     try {
       const config = {
         1: { orientation: 'p', cols: 1, rows: 1, w: 160, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
-        8: { orientation: 'l', cols: 4, rows: 2, w: 65, xStart: 18, yStart: 20, xGap: 5, yGap: 10 },
-        16: { orientation: 'p', cols: 4, rows: 4, w: 45, xStart: 10, yStart: 10, xGap: 3, yGap: 5 }
+        8: { orientation: 'l', cols: 4, rows: 2, w: 62, xStart: 15, yStart: 15, xGap: 5, yGap: 5 },
+        16: { orientation: 'p', cols: 4, rows: 4, w: 42, xStart: 12, yStart: 12, xGap: 4, yGap: 4 }
       };
 
       const settings = config[layout];
@@ -101,7 +101,7 @@ export const TicketList: React.FC = () => {
         if (element) {
           // Capture element as high-res canvas
           const canvas = await html2canvas(element, {
-            scale: layout === 16 ? 4 : 2, // Higher scale for better quality
+            scale: 3, // Higher scale for better quality
             backgroundColor: '#ffffff', // Force white background
             logging: false,
             useCORS: true 
