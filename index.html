@@ -84,7 +84,7 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
            // Register SW in production
-           if (!window.location.hostname.includes('webcontainer') && !window.location.hostname.includes('localhost')) {
+           if (!window.location.hostname.includes('webcontainer')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
                .catch(err => console.log('SW failed', err));
