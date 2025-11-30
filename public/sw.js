@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'secure-event-v26';
+const CACHE_NAME = 'secure-event-v28';
 const urlsToCache = [
   './',
   './index.html',
@@ -12,14 +12,15 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache).catch(err => {
+             console.warn("SW Cache Error (non-critical):", err);
+        });
       })
   );
   self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache http/https requests
   if (!event.request.url.startsWith('http')) return;
   
   event.respondWith(

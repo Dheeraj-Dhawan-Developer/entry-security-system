@@ -49,21 +49,21 @@
 <script type="importmap">
 {
   "imports": {
-    "jspdf": "https://aistudiocdn.com/jspdf@^3.0.4",
-    "vite": "https://aistudiocdn.com/vite@^7.2.4",
-    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5",
-    "react-qr-code": "https://aistudiocdn.com/react-qr-code@^2.0.18",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
-    "jsqr": "https://aistudiocdn.com/jsqr@^1.4.0"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "jsqr": "https://aistudiocdn.com/jsqr@^1.4.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "uuid": "https://aistudiocdn.com/uuid@^13.0.0",
+    "xlsx": "https://aistudiocdn.com/xlsx@^0.18.5",
+    "jspdf": "https://aistudiocdn.com/jspdf@^3.0.4",
+    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "react-qr-code": "https://aistudiocdn.com/react-qr-code@^2.0.18",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
@@ -76,15 +76,15 @@
         </div>
     </div>
     
-    <!-- Entry Point: Vite will compile this automatically during build -->
+    <!-- Entry Point: Vite will compile this automatically during build. NO IMPORT MAPS HERE. -->
     <script type="module" src="./index.tsx"></script>
 
     <script>
       // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-           // Register SW in production
-           if (!window.location.hostname.includes('webcontainer')) {
+           // Register SW in production only
+           if (!window.location.hostname.includes('webcontainer') && !window.location.hostname.includes('localhost')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
                .catch(err => console.log('SW failed', err));
