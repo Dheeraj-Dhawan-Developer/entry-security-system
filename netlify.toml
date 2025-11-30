@@ -1,68 +1,11 @@
-# ===============================
-# Fix JS / Module MIME Issues
-# ===============================
+[build]
+  command = "npm run build"
+  publish = "dist"
 
-[[headers]]
-  for = "/assets/*.js"
-  [headers.values]
-    Content-Type = "application/javascript; charset=utf-8"
-    Cache-Control = "public, max-age=0, must-revalidate"
+[dev]
+  command = "npm run dev"
 
-[[headers]]
-  for = "/*.js"
-  [headers.values]
-    Content-Type = "application/javascript; charset=utf-8"
-
-[[headers]]
-  for = "/*.mjs"
-  [headers.values]
-    Content-Type = "application/javascript; charset=utf-8"
-
-[[headers]]
-  for = "/*.jsx"
-  [headers.values]
-    Content-Type = "application/javascript; charset=utf-8"
-
-
-
-# ===============================
-# Fix SVG MIME Issues
-# ===============================
-
-[[headers]]
-  for = "/icons/*.svg"
-  [headers.values]
-    Content-Type = "image/svg+xml"
-
-[[headers]]
-  for = "/assets/*.svg"
-  [headers.values]
-    Content-Type = "image/svg+xml"
-
-
-
-# ===============================
-# Manifest & JSON MIME Fix
-# ===============================
-
-[[headers]]
-  for = "/manifest.json"
-  [headers.values]
-    Content-Type = "application/manifest+json"
-
-[[headers]]
-  for = "/*.json"
-  [headers.values]
-    Content-Type = "application/json"
-
-
-
-# ===============================
-# Global Browser Safety Fix
-# ===============================
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    X-Content-Type-Options = "nosniff"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
