@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     root: '.', 
-    base: './', // CRITICAL for Netlify/GitHub Pages relative paths
+    base: '/', // Standard setting for Netlify root deployment
     publicDir: 'public',
     build: {
       outDir: 'dist',

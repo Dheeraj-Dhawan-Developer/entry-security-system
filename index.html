@@ -76,14 +76,14 @@
         </div>
     </div>
     
-    <!-- Entry Point: Vite will compile this automatically during build. NO IMPORT MAPS HERE. -->
+    <!-- Entry Point: Vite will compile this automatically during build -->
     <script type="module" src="./index.tsx"></script>
 
     <script>
       // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-           // Register SW in production only
+           // Register SW in production
            if (!window.location.hostname.includes('webcontainer') && !window.location.hostname.includes('localhost')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
