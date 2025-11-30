@@ -46,7 +46,7 @@
       }
       @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -83,12 +83,9 @@
       // Service Worker Registration
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-           // Register SW in production
-           if (!window.location.hostname.includes('webcontainer')) {
              navigator.serviceWorker.register('./sw.js')
                .then(reg => console.log('SW active'))
                .catch(err => console.log('SW failed', err));
-           }
         });
       }
     </script>

@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'secure-event-v35';
+const CACHE_NAME = 'secure-event-v37';
 const urlsToCache = [
   './',
   './index.html',
