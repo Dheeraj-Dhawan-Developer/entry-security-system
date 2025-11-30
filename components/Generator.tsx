@@ -160,15 +160,18 @@ export const Generator: React.FC = () => {
     setIsGeneratingPdf(true);
     
     try {
-      const doc = new jsPDF('p', 'mm', 'a4'); // A4: 210mm x 297mm
-      
+      // Define config with Orientation
       const config = {
-        1: { cols: 1, rows: 1, w: 160, h: 0, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
-        8: { cols: 2, rows: 4, w: 90, h: 0, xStart: 10, yStart: 10, xGap: 5, yGap: 5 },
-        16: { cols: 4, rows: 4, w: 45, h: 0, xStart: 10, yStart: 10, xGap: 3, yGap: 3 }
+        1: { orientation: 'p', cols: 1, rows: 1, w: 160, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
+        // Use Landscape for 8-up (4 cols x 2 rows) to prevent vertical overflow
+        8: { orientation: 'l', cols: 4, rows: 2, w: 65, xStart: 18, yStart: 20, xGap: 5, yGap: 10 },
+        16: { orientation: 'p', cols: 4, rows: 4, w: 45, xStart: 10, yStart: 10, xGap: 3, yGap: 5 }
       };
 
       const settings = config[layout];
+      // @ts-ignore - 'orientation' type check
+      const doc = new jsPDF(settings.orientation, 'mm', 'a4'); 
+      
       const ticketsPerPage = settings.cols * settings.rows;
       
       for (let i = 0; i < bulkResults.added.length; i++) {
@@ -178,7 +181,7 @@ export const Generator: React.FC = () => {
         
         if (element) {
           const canvas = await html2canvas(element, {
-            scale: layout === 16 ? 4 : 2, // Higher scale for smaller images
+            scale: layout === 16 ? 4 : 2, 
             backgroundColor: '#ffffff',
             logging: false,
             useCORS: true 
@@ -404,7 +407,7 @@ export const Generator: React.FC = () => {
                       <CheckCircle2 className="w-5 h-5" />
                       <div>
                         <span className="font-bold text-xl block leading-none">{bulkResults.added.length}</span>
-                        <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Generated</span>
+                        <span className="text-xs uppercase font-bold tracking-wider opacity-70">Generated</span>
                       </div>
                    </div>
                    {bulkResults.failed.length > 0 && (
@@ -412,7 +415,7 @@ export const Generator: React.FC = () => {
                         <AlertCircle className="w-5 h-5" />
                          <div>
                           <span className="font-bold text-xl block leading-none">{bulkResults.failed.length}</span>
-                          <span className="text-[10px] uppercase font-bold tracking-wider opacity-70">Skipped</span>
+                          <span className="text-xs uppercase font-bold tracking-wider opacity-70">Skipped</span>
                         </div>
                      </div>
                    )}
@@ -436,19 +439,19 @@ export const Generator: React.FC = () => {
                       </button>
 
                       {showLayoutMenu && (
-                        <div className="absolute right-0 bottom-full mb-2 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden ring-1 ring-white/10 animate-in fade-in zoom-in duration-200">
+                        <div className="absolute right-0 bottom-full mb-2 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden ring-1 ring-white/10 animate-in fade-in zoom-in duration-200">
                           <div className="p-3 text-[10px] text-slate-500 font-bold uppercase tracking-wider bg-slate-900/80">Select Print Layout</div>
                           <button onClick={() => generatePdf(1)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm transition-colors flex items-center justify-between group">
                             <span>1 Ticket / Page</span>
-                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Large</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Portrait</span>
                           </button>
                           <button onClick={() => generatePdf(8)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm border-t border-slate-700/50 transition-colors flex items-center justify-between group">
                             <span>8 Tickets / Page</span>
-                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Grid</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Landscape</span>
                           </button>
                           <button onClick={() => generatePdf(16)} className="w-full text-left px-5 py-3 hover:bg-indigo-600 hover:text-white text-slate-300 text-sm border-t border-slate-700/50 transition-colors flex items-center justify-between group">
                             <span>16 Tickets / Page</span>
-                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Compact</span>
+                            <span className="text-xs opacity-50 group-hover:opacity-100 bg-black/20 px-1.5 py-0.5 rounded">Portrait</span>
                           </button>
                         </div>
                       )}

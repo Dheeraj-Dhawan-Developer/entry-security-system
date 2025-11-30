@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { getTickets, deleteTicket, getBatches } from '../services/storageService';
 import { TicketRecord, QRCodeData, BatchLog } from '../types';
@@ -80,15 +81,16 @@ export const TicketList: React.FC = () => {
     setIsGeneratingPdf(true);
     
     try {
-      const doc = new jsPDF('p', 'mm', 'a4'); // Portrait, Millimeters, A4
-      
       const config = {
-        1: { cols: 1, rows: 1, w: 160, h: 0, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
-        8: { cols: 2, rows: 4, w: 90, h: 0, xStart: 10, yStart: 10, xGap: 5, yGap: 5 },
-        16: { cols: 4, rows: 4, w: 45, h: 0, xStart: 10, yStart: 10, xGap: 3, yGap: 3 }
+        1: { orientation: 'p', cols: 1, rows: 1, w: 160, xStart: 25, yStart: 40, xGap: 0, yGap: 0 },
+        8: { orientation: 'l', cols: 4, rows: 2, w: 65, xStart: 18, yStart: 20, xGap: 5, yGap: 10 },
+        16: { orientation: 'p', cols: 4, rows: 4, w: 45, xStart: 10, yStart: 10, xGap: 3, yGap: 5 }
       };
 
       const settings = config[layout];
+      // @ts-ignore
+      const doc = new jsPDF(settings.orientation, 'mm', 'a4');
+      
       const ticketsPerPage = settings.cols * settings.rows;
 
       for (let i = 0; i < filteredTickets.length; i++) {
@@ -273,16 +275,16 @@ export const TicketList: React.FC = () => {
                  </button>
 
                  {showLayoutMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-hidden">
                       <div className="p-2 text-xs text-slate-500 font-medium uppercase bg-slate-900/50">Select Layout</div>
                       <button onClick={() => generatePdf(1)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm">
-                        1 Ticket per Page
+                        1 Ticket per Page (Portrait)
                       </button>
                       <button onClick={() => generatePdf(8)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm border-t border-slate-700">
-                        8 Tickets per Page (2x4)
+                        8 Tickets per Page (Landscape)
                       </button>
                       <button onClick={() => generatePdf(16)} className="w-full text-left px-4 py-3 hover:bg-slate-700 text-white text-sm border-t border-slate-700">
-                        16 Tickets per Page (4x4)
+                        16 Tickets per Page (Portrait)
                       </button>
                     </div>
                   )}
